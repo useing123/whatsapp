@@ -1,4 +1,3 @@
-// src/whatsapp/whatsapp.service.ts
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import * as fs from 'fs';
@@ -12,7 +11,6 @@ export class WhatsappService implements OnModuleInit {
     this.client = new Client({
       authStrategy: new LocalAuth(),
       puppeteer: {
-        executablePath: '/usr/bin/chromium',
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
       },
