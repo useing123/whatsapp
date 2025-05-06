@@ -1,7 +1,8 @@
 // src/whatsapp/whatsapp.service.ts
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Client, LocalAuth } from 'whatsapp-web.js';
-import * as qrcode from 'qrcode-terminal';
+import * as fs from 'fs';
+import * as qrcode from 'qrcode';
 
 @Injectable()
 export class WhatsappService implements OnModuleInit {
@@ -10,11 +11,16 @@ export class WhatsappService implements OnModuleInit {
   async onModuleInit() {
     this.client = new Client({
       authStrategy: new LocalAuth(),
+      puppeteer: {
+        executablePath: '/usr/bin/chromium',
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      },
     });
 
-    this.client.on('qr', (qr) => {
-      console.log('Сканируй QR-код:');
-      qrcode.generate(qr, { small: true });
+    this.client.on('qr', async (qr) => {
+      console.log('QR получен. Сохраняем...');
+      await qrcode.toFile('qr.png', qr);
     });
 
     this.client.on('ready', () => {

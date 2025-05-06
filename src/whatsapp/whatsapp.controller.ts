@@ -1,6 +1,7 @@
-// src/whatsapp/whatsapp.controller.ts
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Res } from '@nestjs/common';
 import { WhatsappService } from './whatsapp.service';
+import { Response } from 'express';
+import * as fs from 'fs';
 
 @Controller('whatsapp')
 export class WhatsappController {
@@ -8,12 +9,17 @@ export class WhatsappController {
 
   @Post('send')
   async sendMessage(@Body() body: { number: string; message: string }) {
-    const { number, message } = body;
-    if (!number || !message) {
-      throw new BadRequestException('Номер и сообщение обязательны');
-    }
+    await this.whatsappService.sendMessage(body.number, body.message);
+    return { status: 'ok' };
+  }
 
-    await this.whatsappService.sendMessage(number, message);
-    return { status: 'Сообщение отправлено' };
+  @Get('qr')
+  async getQrCode(@Res() res: Response) {
+    const qrPath = 'qr.png';
+    if (fs.existsSync(qrPath)) {
+      res.sendFile(qrPath, { root: '.' });
+    } else {
+      res.status(404).send('QR не сгенерирован');
+    }
   }
 }
