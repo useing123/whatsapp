@@ -2,6 +2,7 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import * as fs from 'fs';
 import * as qrcode from 'qrcode';
+import * as qrcodeTerminal from 'qrcode-terminal';
 
 @Injectable()
 export class WhatsappService implements OnModuleInit {
@@ -17,8 +18,8 @@ export class WhatsappService implements OnModuleInit {
     });
 
     this.client.on('qr', async (qr) => {
-      console.log('QR получен. Сохраняем...');
-      await qrcode.toFile('qr.png', qr);
+      qrcodeTerminal.generate(qr, { small: true }); // QR-код в консоли
+      await qrcode.toFile('qr.png', qr);            // (опционально) сохраняет в файл
     });
 
     this.client.on('ready', () => {
